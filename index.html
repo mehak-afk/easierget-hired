@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="A private, browser-based job application tracker with follow-up reminders." />
+  <meta name="description" content="A private, browser-based job application tracker with follow-up reminders and curated job matching." />
   <title>EasierGet hired — Job application tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -29,21 +29,12 @@
 
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      min-height: 100dvh;
-      color: var(--ink);
-      background: var(--page);
-      font-family: "Plus Jakarta Sans", Arial, sans-serif;
-      line-height: 1.5;
-    }
+    body { margin: 0; min-height: 100dvh; color: var(--ink); background: var(--page); font-family: "Plus Jakarta Sans", Arial, sans-serif; line-height: 1.5; }
     button, input, select, textarea { font: inherit; }
     button { cursor: pointer; }
     button, input, select, textarea { -webkit-tap-highlight-color: transparent; }
-    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-      outline: 3px solid #0b75ad;
-      outline-offset: 3px;
-    }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px solid #0b75ad; outline-offset: 3px; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
     .skip-link { position: absolute; top: -80px; left: 1rem; z-index: 20; background: #fff; padding: .7rem 1rem; border-radius: 8px; color: var(--blue-dark); }
     .skip-link:focus { top: 1rem; }
     .shell { max-width: 1220px; margin: 0 auto; padding: 0 24px 48px; }
@@ -69,6 +60,8 @@
     .button-primary:hover { background: var(--blue-dark); }
     .button-secondary { color: var(--blue-dark); background: #fff; border-color: var(--line); }
     .button-secondary:hover { background: var(--sky); border-color: var(--blue); }
+    .button-tertiary { min-height: 38px; padding: 0 8px; color: var(--blue-dark); border: 0; background: transparent; font-size: 12px; }
+    .button-tertiary:hover { color: var(--blue); text-decoration: underline; transform: none; }
     .button-small { min-height: 38px; padding: 0 12px; font-size: 12px; }
 
     .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 26px; }
@@ -80,13 +73,72 @@
     .metric.alert { border-color: #f4afb6; background: var(--red-bg); }
     .metric.alert .metric-label, .metric.alert .metric-label svg, .metric.alert .metric-value { color: var(--red); }
 
-    .content-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .75fr); gap: 22px; align-items: start; }
     .panel { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
     .panel-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 21px 22px 18px; border-bottom: 1px solid var(--line); }
     .panel-title { margin: 0; font-size: 18px; letter-spacing: -.035em; }
     .panel-subtitle { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
     .count { flex: 0 0 auto; padding: 4px 9px; border-radius: 99px; color: var(--blue-dark); background: var(--sky); font-size: 12px; font-weight: 800; }
+    .form-body, .checker-body { padding: 22px; }
+    .form-grid { display: grid; gap: 13px; }
+    .field { display: grid; gap: 6px; }
+    label, legend { font-size: 12px; font-weight: 800; }
+    input, select, textarea { width: 100%; min-height: 44px; padding: 10px 11px; color: var(--ink); border: 1px solid #a8cddb; border-radius: 9px; background: #fff; font-size: 14px; }
+    textarea { min-height: 112px; resize: vertical; line-height: 1.5; }
+    input::placeholder, textarea::placeholder { color: #8394a8; }
+    input:focus, select:focus, textarea:focus { border-color: var(--blue); }
+    input[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--red); background: #fffafb; }
+    .field-error { min-height: 18px; color: var(--red); font-size: 11px; font-weight: 700; }
+    .helper { margin: 15px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .helper strong { color: var(--red); }
 
+    .matcher { margin-bottom: 26px; }
+    .matcher-layout { display: grid; grid-template-columns: minmax(280px, .78fr) minmax(0, 1.22fr); gap: 0; }
+    .matcher-form { padding: 22px; border-right: 1px solid var(--line); background: #fbfdff; }
+    .matcher-results { min-width: 0; padding: 22px; }
+    .matcher-copy { margin: 0 0 18px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+    .profile-grid .span-two { grid-column: 1 / -1; }
+    .compact-helper { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .button-row { display: flex; align-items: center; gap: 10px; margin-top: 3px; }
+    .button-row .button-primary { flex: 1; }
+    .matcher-disclosure { display: flex; align-items: flex-start; gap: 8px; margin: 16px 0 0; padding: 10px; color: #405975; border-radius: 9px; background: var(--sky); font-size: 11px; line-height: 1.5; }
+    .matcher-disclosure svg { flex: 0 0 auto; width: 16px; height: 16px; margin-top: 1px; color: var(--blue); }
+    .results-topline { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .results-heading { margin: 0; font-size: 15px; letter-spacing: -.025em; }
+    .results-status { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+    .sort-field { display: flex; flex: 0 0 auto; align-items: center; gap: 6px; }
+    .sort-field label { color: var(--muted); font-size: 11px; }
+    .sort-field select { width: auto; min-height: 38px; padding: 7px 26px 7px 8px; font-size: 11px; }
+    .match-list { display: grid; gap: 11px; }
+    .match-card { padding: 15px; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
+    .match-card-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; }
+    .match-card h3 { margin: 0; font-size: 15px; letter-spacing: -.025em; }
+    .match-company { margin: 2px 0 0; color: var(--blue-dark); font-size: 12px; font-weight: 800; }
+    .match-score { display: grid; min-width: 68px; place-items: center; padding: 6px 8px; border-radius: 9px; color: var(--blue-dark); background: var(--sky); text-align: center; }
+    .match-score strong { font-size: 15px; letter-spacing: -.04em; line-height: 1.1; }
+    .match-score span { margin-top: 2px; font-size: 9px; font-weight: 800; text-transform: uppercase; }
+    .match-score.strong { color: var(--green); background: var(--green-bg); }
+    .match-score.potential { color: var(--amber); background: var(--amber-bg); }
+    .match-meta { display: flex; flex-wrap: wrap; gap: 6px 13px; margin: 11px 0; color: var(--muted); font-size: 11px; }
+    .match-meta span { display: inline-flex; align-items: center; gap: 4px; }
+    .match-meta svg { width: 14px; height: 14px; color: var(--blue); }
+    .match-reason { margin: 0 0 11px; padding: 9px 10px; color: #31536d; border-left: 3px solid #7ac6e5; background: #f3fbff; font-size: 11px; line-height: 1.5; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 7px; }
+    .keyword, .skill-tag { padding: 5px 8px; border-radius: 7px; font-size: 11px; font-weight: 800; }
+    .keyword { color: var(--red); background: var(--red-bg); border: 1px solid #f5c7cc; }
+    .skill-tag { color: var(--green); background: var(--green-bg); }
+    .match-card details { margin-top: 11px; color: var(--muted); font-size: 11px; }
+    .match-card summary { color: var(--blue-dark); font-weight: 800; cursor: pointer; }
+    .match-card details p { margin: 7px 0 0; line-height: 1.5; }
+    .match-actions { display: flex; justify-content: flex-end; margin-top: 13px; }
+    .match-actions .button[disabled] { color: #718198; border-color: #d3e0e7; background: #eef4f7; cursor: not-allowed; transform: none; }
+    .matcher-empty { display: grid; min-height: 248px; place-items: center; padding: 24px; color: var(--muted); text-align: center; }
+    .matcher-empty svg { width: 34px; height: 34px; margin-bottom: 8px; color: var(--blue); }
+    .matcher-empty h3 { margin: 0 0 5px; color: var(--ink); font-size: 15px; }
+    .matcher-empty p { max-width: 315px; margin: 0; font-size: 12px; line-height: 1.55; }
+    .matcher-empty .button { margin-top: 13px; }
+
+    .content-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .75fr); gap: 22px; align-items: start; }
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; min-width: 690px; }
     th { padding: 13px 22px; color: var(--muted); background: #fbfdff; border-bottom: 1px solid var(--line); font-size: 11px; font-weight: 800; letter-spacing: .06em; text-align: left; text-transform: uppercase; }
@@ -106,7 +158,7 @@
     .age { color: var(--muted); font-size: 12px; white-space: nowrap; }
     .age.overdue-age { color: var(--red); font-weight: 800; }
     .row-actions { display: flex; justify-content: flex-end; gap: 7px; }
-    .icon-button { display: inline-grid; width: 36px; height: 36px; place-items: center; color: var(--blue-dark); border: 1px solid var(--line); border-radius: 9px; background: #fff; transition: background-color .18s ease, border-color .18s ease; }
+    .icon-button { display: inline-grid; width: 38px; height: 38px; place-items: center; color: var(--blue-dark); border: 1px solid var(--line); border-radius: 9px; background: #fff; transition: background-color .18s ease, border-color .18s ease; }
     .icon-button:hover { background: var(--sky); border-color: var(--blue); }
     .icon-button.danger { color: var(--red); }
     .icon-button.danger:hover { background: #fff3f4; border-color: #ed8f9b; }
@@ -116,19 +168,7 @@
     .empty p { margin: 0; font-size: 13px; }
 
     .side-stack { display: grid; gap: 22px; }
-    .form-body, .checker-body { padding: 22px; }
-    .form-grid { display: grid; gap: 13px; }
-    .field { display: grid; gap: 6px; }
-    label { font-size: 12px; font-weight: 800; }
-    input, select, textarea { width: 100%; min-height: 44px; padding: 10px 11px; color: var(--ink); border: 1px solid #a8cddb; border-radius: 9px; background: #fff; font-size: 14px; }
-    textarea { min-height: 112px; resize: vertical; line-height: 1.5; }
-    input::placeholder, textarea::placeholder { color: #8394a8; }
-    input:focus, select:focus, textarea:focus { border-color: var(--blue); }
-    .field-error { min-height: 18px; color: var(--red); font-size: 11px; font-weight: 700; }
     .form-submit { width: 100%; margin-top: 4px; }
-    .helper { margin: 15px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
-    .helper strong { color: var(--red); }
-
     .checker .panel-header { align-items: flex-start; }
     .checker-intro { margin: 0 0 13px; color: var(--muted); font-size: 12px; line-height: 1.55; }
     .checker .button { width: 100%; }
@@ -136,8 +176,6 @@
     .gap-results.show { display: block; }
     .gap-results h3 { margin-bottom: 8px; font-size: 13px; }
     .gap-summary { margin-bottom: 10px; color: var(--muted); font-size: 12px; }
-    .tag-list { display: flex; flex-wrap: wrap; gap: 7px; }
-    .keyword { padding: 5px 8px; border-radius: 7px; color: var(--red); background: var(--red-bg); border: 1px solid #f5c7cc; font-size: 11px; font-weight: 800; }
     .match-message { display: none; padding: 11px; border-radius: 9px; color: var(--green); background: var(--green-bg); font-size: 12px; font-weight: 700; }
     .match-message.show { display: block; }
 
@@ -148,6 +186,8 @@
     @media (max-width: 860px) {
       .hero { grid-template-columns: 1fr; align-items: start; }
       .hero-action { align-self: start; }
+      .matcher-layout { grid-template-columns: 1fr; }
+      .matcher-form { border-right: 0; border-bottom: 1px solid var(--line); }
       .content-grid { grid-template-columns: 1fr; }
       .side-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
     }
@@ -159,11 +199,17 @@
       .summary { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       .metric { min-height: 110px; padding: 15px; }
       .metric-value { font-size: 27px; }
-      .panel-header, .form-body, .checker-body { padding-left: 16px; padding-right: 16px; }
+      .panel-header, .form-body, .checker-body, .matcher-form, .matcher-results { padding-left: 16px; padding-right: 16px; }
       th, td { padding-left: 16px; padding-right: 16px; }
       .side-stack { grid-template-columns: 1fr; }
       .button { min-height: 48px; }
       .hero-action .button { width: 100%; }
+      .profile-grid { grid-template-columns: 1fr; }
+      .profile-grid .span-two { grid-column: auto; }
+      .results-topline { align-items: flex-start; flex-direction: column; }
+      .sort-field { width: 100%; justify-content: space-between; }
+      .sort-field select { flex: 1; }
+      .match-actions .button { width: 100%; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
@@ -172,16 +218,14 @@
   </style>
 </head>
 <body>
-  <a class="skip-link" href="#tracker">Skip to applications</a>
+  <a class="skip-link" href="#matcher">Skip to job matches</a>
   <div class="shell">
     <header>
       <a class="brand" href="#top" aria-label="EasierGet hired home">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6V4h8v2"/><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 12h18M10 12v2h4v-2"/></svg>
-        </span>
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6V4h8v2"/><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 12h18M10 12v2h4v-2"/></svg></span>
         <span>EasierGet <span style="color: var(--blue)">hired</span></span>
       </a>
-      <div class="local-note" title="Your applications stay in this browser">
+      <div class="local-note" title="Your applications and search profile stay in this browser">
         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <span>Saved privately in this browser</span>
       </div>
@@ -192,9 +236,9 @@
         <div>
           <p class="eyebrow">Job search, made easier</p>
           <h1 id="page-title">Keep your next opportunity from going cold.</h1>
-          <p>Track every application in one clear view. We flag applications that deserve a friendly follow-up, so you always know your next move.</p>
+          <p>Track every application in one clear view. Then let the match finder surface curated opportunities that fit what you are looking for.</p>
         </div>
-        <div class="hero-action"><a class="button button-primary" href="#add-application"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add application</a></div>
+        <div class="hero-action"><a class="button button-primary" href="#matcher"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Find job matches</a></div>
       </section>
 
       <section class="summary" aria-label="Application summary">
@@ -204,19 +248,64 @@
         <article class="metric"><div class="metric-label"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>Offers</div><div class="metric-value" id="offer-count">0</div><p class="metric-copy">Proof your work is paying off</p></article>
       </section>
 
+      <section class="panel matcher" id="matcher" aria-labelledby="matcher-heading">
+        <div class="panel-header">
+          <div><h2 class="panel-title" id="matcher-heading">Curated job matches</h2><p class="panel-subtitle">Build a quick search profile and compare it with demo opportunities.</p></div>
+          <span class="count">Private & local</span>
+        </div>
+        <div class="matcher-layout">
+          <form class="matcher-form" id="profile-form" novalidate>
+            <p class="matcher-copy">Tell the match finder what good looks like. It will explain exactly why each curated opportunity fits.</p>
+            <div class="profile-grid">
+              <div class="field span-two">
+                <label for="target-role">Target role <span aria-hidden="true">*</span></label>
+                <input id="target-role" name="target-role" autocomplete="organization-title" placeholder="e.g. Product Marketing Coordinator" aria-describedby="target-role-error" required />
+                <div class="field-error" id="target-role-error" aria-live="polite"></div>
+              </div>
+              <div class="field span-two">
+                <label for="profile-skills">Your skills <span aria-hidden="true">*</span></label>
+                <input id="profile-skills" name="profile-skills" placeholder="e.g. content strategy, analytics, copywriting" aria-describedby="profile-skills-help profile-skills-error" required />
+                <p class="compact-helper" id="profile-skills-help">Separate skills with commas. We only use these words in this browser.</p>
+                <div class="field-error" id="profile-skills-error" aria-live="polite"></div>
+              </div>
+              <div class="field">
+                <label for="profile-industry">Industry</label>
+                <select id="profile-industry" name="profile-industry"><option value="">Open to any industry</option><option>SaaS</option><option>Healthcare</option><option>Education</option><option>Finance</option><option>Consumer</option><option>Creative</option></select>
+              </div>
+              <div class="field">
+                <label for="profile-experience">Experience level</label>
+                <select id="profile-experience" name="profile-experience"><option value="">Open to all levels</option><option>Entry</option><option>Associate</option><option>Mid-level</option><option>Senior</option></select>
+              </div>
+              <div class="field">
+                <label for="profile-work-mode">Work preference</label>
+                <select id="profile-work-mode" name="profile-work-mode"><option value="">Open to any work style</option><option>Remote</option><option>Hybrid</option><option>On-site</option></select>
+              </div>
+              <div class="field">
+                <label for="profile-location">Preferred location</label>
+                <input id="profile-location" name="profile-location" autocomplete="address-level2" placeholder="e.g. Chicago or Remote" />
+              </div>
+            </div>
+            <div class="button-row"><button class="button button-primary" type="submit"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2"/></svg>Find my matches</button><button class="button button-tertiary" type="button" id="reset-profile">Reset</button></div>
+            <p class="matcher-disclosure"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span>Demo note: match scores are calculated locally from your profile and a curated set of fictional job examples. This is not a live job search or an AI service.</span></p>
+          </form>
+
+          <section class="matcher-results" aria-labelledby="matches-heading">
+            <div class="results-topline">
+              <div><h3 class="results-heading" id="matches-heading" tabindex="-1">Your best-fit opportunities</h3><p class="results-status" id="match-status" role="status" aria-live="polite">Create a profile to see curated job matches.</p></div>
+              <div class="sort-field"><label for="match-sort">Sort</label><select id="match-sort" aria-label="Sort job matches"><option value="best">Best match</option><option value="skills">Skills overlap</option><option value="role">Role relevance</option></select></div>
+            </div>
+            <div id="match-results" class="matcher-empty">
+              <div><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.2-4.2M11 8v6M8 11h6"/></svg><h3>Ready when you are</h3><p>Add a target role and a few skills to see which curated opportunities are worth exploring first.</p></div>
+            </div>
+          </section>
+        </div>
+      </section>
+
       <section class="content-grid">
         <section class="panel" id="tracker" aria-labelledby="applications-heading">
           <div class="panel-header"><div><h2 class="panel-title" id="applications-heading">Your applications</h2><p class="panel-subtitle">Red rows need a follow-up today.</p></div><span class="count" id="table-count">0 applications</span></div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th scope="col">Company & role</th><th scope="col">Stage</th><th scope="col">Applied</th><th scope="col">Follow-up</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
-              <tbody id="applications-body"></tbody>
-            </table>
-          </div>
-          <div class="empty" id="empty-state" hidden>
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M7 11h10M7 15h6"/></svg>
-            <p>No applications yet. Add your first one and we’ll keep the follow-ups on track.</p>
-          </div>
+          <div class="table-wrap"><table><thead><tr><th scope="col">Company & role</th><th scope="col">Stage</th><th scope="col">Applied</th><th scope="col">Follow-up</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead><tbody id="applications-body"></tbody></table></div>
+          <div class="empty" id="empty-state" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M7 11h10M7 15h6"/></svg><p>No applications yet. Add your first one and we’ll keep the follow-ups on track.</p></div>
         </section>
 
         <aside class="side-stack">
@@ -253,40 +342,71 @@
 
   <script>
     const STORAGE_KEY = 'easierget-hired-applications-v1';
+    const PROFILE_STORAGE_KEY = 'easierget-hired-job-profile-v1';
     const $ = (selector) => document.querySelector(selector);
     const icons = {
       copy: '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"/></svg>',
-      trash: '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M9 7l1-3h4l1 3M6 7l1 13h10l1-13"/></svg>'
+      trash: '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M9 7l1-3h4l1 3M6 7l1 13h10l1-13"/></svg>',
+      pin: '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/></svg>',
+      briefcase: '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6V4h8v2"/><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 12h18M10 12v2h4v-2"/></svg>'
     };
 
-    const formatISO = (date) => {
-      const offset = date.getTimezoneOffset() * 60000;
-      return new Date(date.getTime() - offset).toISOString().slice(0, 10);
-    };
+    const formatISO = (date) => { const offset = date.getTimezoneOffset() * 60000; return new Date(date.getTime() - offset).toISOString().slice(0, 10); };
     const dateDaysAgo = (days) => { const date = new Date(); date.setDate(date.getDate() - days); return formatISO(date); };
+    const normalizeText = (value = '') => value.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9+#.\s-]/g, ' ').replace(/\s+/g, ' ').trim();
+    const tokenize = (value = '') => normalizeText(value).split(/[^a-z0-9+#.]+/).filter((word) => word.length > 1);
+    const unique = (items) => [...new Set(items.filter(Boolean))];
+    const splitSkills = (value = '') => unique(value.split(',').map(normalizeText).filter(Boolean));
+    const escapeHTML = (value) => { const div = document.createElement('div'); div.textContent = value; return div.innerHTML; };
+
     const defaultApplications = [
       { id: 'demo-1', company: 'Northstar Labs', role: 'Product Marketing Coordinator', stage: 'Applied', date: dateDaysAgo(18) },
       { id: 'demo-2', company: 'Cedar & Co.', role: 'People Operations Assistant', stage: 'Interview', date: dateDaysAgo(14) },
       { id: 'demo-3', company: 'Harbor Health', role: 'Client Success Associate', stage: 'Applied', date: dateDaysAgo(13) },
       { id: 'demo-4', company: 'Fable Finance', role: 'Community Manager', stage: 'Offer', date: dateDaysAgo(5) }
     ];
+    const defaultProfile = { targetRole: '', skills: '', industry: '', experience: '', workMode: '', location: '' };
+    const curatedJobs = [
+      { id: 'match-river-product', company: 'Riverstone Cloud', title: 'Product Marketing Coordinator', industry: 'SaaS', location: 'Remote — United States', workMode: 'Remote', experience: 'Associate', requiredSkills: ['content strategy', 'campaign management', 'analytics'], preferredSkills: ['copywriting', 'product launches'], roleKeywords: ['product marketing', 'marketing coordinator'], summary: 'Turn customer insight into clear launches, campaigns, and stories for growing software teams.' },
+      { id: 'match-fieldmark-content', company: 'Fieldmark Studio', title: 'Content Marketing Associate', industry: 'Creative', location: 'Chicago, IL · Hybrid', workMode: 'Hybrid', experience: 'Entry', requiredSkills: ['content strategy', 'copywriting', 'social media'], preferredSkills: ['analytics', 'seo'], roleKeywords: ['content marketing', 'marketing associate'], summary: 'Create useful content across client campaigns and help measure what connects with audiences.' },
+      { id: 'match-cedar-people', company: 'Cedar & Co.', title: 'People Operations Assistant', industry: 'Consumer', location: 'New York, NY · Hybrid', workMode: 'Hybrid', experience: 'Entry', requiredSkills: ['employee experience', 'organization', 'communication'], preferredSkills: ['onboarding', 'scheduling'], roleKeywords: ['people operations', 'hr assistant'], summary: 'Help a growing people team make every candidate and employee moment feel well organized.' },
+      { id: 'match-harbor-client', company: 'Harbor Health', title: 'Client Success Associate', industry: 'Healthcare', location: 'Remote — United States', workMode: 'Remote', experience: 'Associate', requiredSkills: ['customer success', 'communication', 'problem solving'], preferredSkills: ['crm', 'analytics'], roleKeywords: ['client success', 'customer success'], summary: 'Support healthcare partners with thoughtful onboarding, proactive follow-up, and clear problem solving.' },
+      { id: 'match-alder-analyst', company: 'Alder Finance', title: 'Marketing Analytics Associate', industry: 'Finance', location: 'Boston, MA · Hybrid', workMode: 'Hybrid', experience: 'Associate', requiredSkills: ['analytics', 'reporting', 'excel'], preferredSkills: ['sql', 'campaign management'], roleKeywords: ['marketing analytics', 'marketing analyst'], summary: 'Translate campaign data into practical recommendations for an ambitious financial education team.' },
+      { id: 'match-sunrise-community', company: 'Sunrise Learning', title: 'Community Growth Coordinator', industry: 'Education', location: 'Remote — North America', workMode: 'Remote', experience: 'Entry', requiredSkills: ['community management', 'content strategy', 'communication'], preferredSkills: ['events', 'social media'], roleKeywords: ['community manager', 'community coordinator'], summary: 'Grow a welcoming learning community through thoughtful programs, content, and member conversations.' },
+      { id: 'match-brightline-designer', company: 'Brightline Studio', title: 'Junior Brand Designer', industry: 'Creative', location: 'Austin, TX · On-site', workMode: 'On-site', experience: 'Entry', requiredSkills: ['figma', 'visual design', 'branding'], preferredSkills: ['adobe creative suite', 'copywriting'], roleKeywords: ['brand designer', 'visual designer'], summary: 'Help a close-knit design studio bring clear, distinct brands to life across digital and print.' },
+      { id: 'match-fable-operations', company: 'Fable Finance', title: 'Community Operations Coordinator', industry: 'Finance', location: 'Remote — United States', workMode: 'Remote', experience: 'Associate', requiredSkills: ['community management', 'organization', 'communication'], preferredSkills: ['reporting', 'events'], roleKeywords: ['community manager', 'operations coordinator'], summary: 'Keep a fast-growing financial wellness community informed, supported, and thoughtfully connected.' },
+      { id: 'match-orbit-project', company: 'Orbit Collective', title: 'Project Coordinator', industry: 'Creative', location: 'Los Angeles, CA · Hybrid', workMode: 'Hybrid', experience: 'Associate', requiredSkills: ['project management', 'organization', 'communication'], preferredSkills: ['client management', 'reporting'], roleKeywords: ['project coordinator', 'project manager'], summary: 'Bring calm structure to creative project work, client moments, timelines, and delivery.' }
+    ];
 
     let applications = getApplications();
+    let profile = getProfile();
+    let currentMatches = [];
+
     function getApplications() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultApplications; }
+      try { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)); return Array.isArray(saved) ? saved : defaultApplications; }
       catch { return defaultApplications; }
     }
-    function saveApplications() { localStorage.setItem(STORAGE_KEY, JSON.stringify(applications)); }
+    function saveApplications() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(applications)); return true; }
+      catch { showToast('Your browser could not save that change.'); return false; }
+    }
+    function isProfile(value) { return value && typeof value === 'object' && ['targetRole', 'skills', 'industry', 'experience', 'workMode', 'location'].every((key) => typeof value[key] === 'string'); }
+    function getProfile() {
+      try { const saved = JSON.parse(localStorage.getItem(PROFILE_STORAGE_KEY)); return isProfile(saved) ? { ...defaultProfile, ...saved } : { ...defaultProfile }; }
+      catch { return { ...defaultProfile }; }
+    }
+    function saveProfile() {
+      try { localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile)); return true; }
+      catch { showToast('Your browser could not save your search profile.'); return false; }
+    }
     function dayDiff(dateString) {
       const [year, month, day] = dateString.split('-').map(Number);
       const appliedDate = new Date(year, month - 1, day);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const today = new Date(); today.setHours(0, 0, 0, 0);
       return Math.max(0, Math.floor((today - appliedDate) / 86400000));
     }
     function needsFollowUp(application) { return ['Applied', 'Interview'].includes(application.stage) && dayDiff(application.date) >= 14; }
     function prettyDate(dateString) { return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(`${dateString}T12:00:00`)); }
-    function escapeHTML(value) { const div = document.createElement('div'); div.textContent = value; return div.innerHTML; }
     function showToast(message) {
       $('#toast-message').textContent = message;
       $('#toast').classList.add('show');
@@ -306,27 +426,170 @@
         const tr = document.createElement('tr');
         if (overdue) tr.className = 'overdue';
         const statusClass = application.stage.toLowerCase();
-        tr.innerHTML = `
-          <td><span class="company">${escapeHTML(application.company)}</span><span class="role">${escapeHTML(application.role)}</span></td>
-          <td><span class="status ${statusClass}">${escapeHTML(application.stage)}</span></td>
-          <td>${prettyDate(application.date)}</td>
-          <td><span class="age ${overdue ? 'overdue-age' : ''}">${overdue ? `${age} days — due now` : `${age} day${age === 1 ? '' : 's'} ago`}</span></td>
-          <td><div class="row-actions">
-            <button class="icon-button" type="button" data-copy="${application.id}" aria-label="Copy follow-up message for ${escapeHTML(application.company)}">${icons.copy}</button>
-            <button class="icon-button danger" type="button" data-delete="${application.id}" aria-label="Delete application for ${escapeHTML(application.company)}">${icons.trash}</button>
-          </div></td>`;
+        tr.innerHTML = `<td><span class="company">${escapeHTML(application.company)}</span><span class="role">${escapeHTML(application.role)}</span></td><td><span class="status ${statusClass}">${escapeHTML(application.stage)}</span></td><td>${prettyDate(application.date)}</td><td><span class="age ${overdue ? 'overdue-age' : ''}">${overdue ? `${age} days — due now` : `${age} day${age === 1 ? '' : 's'} ago`}</span></td><td><div class="row-actions"><button class="icon-button" type="button" data-copy="${application.id}" aria-label="Copy follow-up message for ${escapeHTML(application.company)}">${icons.copy}</button><button class="icon-button danger" type="button" data-delete="${application.id}" aria-label="Delete application for ${escapeHTML(application.company)}">${icons.trash}</button></div></td>`;
         body.appendChild(tr);
       });
       const total = applications.length;
-      const inProgress = applications.filter((a) => ['Applied', 'Interview'].includes(a.stage)).length;
-      const due = applications.filter(needsFollowUp).length;
-      const offers = applications.filter((a) => a.stage === 'Offer').length;
       $('#total-count').textContent = total;
-      $('#progress-count').textContent = inProgress;
-      $('#followup-count').textContent = due;
-      $('#offer-count').textContent = offers;
+      $('#progress-count').textContent = applications.filter((a) => ['Applied', 'Interview'].includes(a.stage)).length;
+      $('#followup-count').textContent = applications.filter(needsFollowUp).length;
+      $('#offer-count').textContent = applications.filter((a) => a.stage === 'Offer').length;
       $('#table-count').textContent = `${total} application${total === 1 ? '' : 's'}`;
+      if (currentMatches.length) renderMatches();
     }
+
+    function fillProfileForm() {
+      $('#target-role').value = profile.targetRole;
+      $('#profile-skills').value = profile.skills;
+      $('#profile-industry').value = profile.industry;
+      $('#profile-experience').value = profile.experience;
+      $('#profile-work-mode').value = profile.workMode;
+      $('#profile-location').value = profile.location;
+    }
+    function setProfileFieldError(field, message) {
+      const input = $(`#${field}`);
+      const error = $(`#${field}-error`);
+      input.setAttribute('aria-invalid', message ? 'true' : 'false');
+      error.textContent = message;
+    }
+    function readProfileForm() {
+      return { targetRole: $('#target-role').value.trim(), skills: $('#profile-skills').value.trim(), industry: $('#profile-industry').value, experience: $('#profile-experience').value, workMode: $('#profile-work-mode').value, location: $('#profile-location').value.trim() };
+    }
+    function profileIsReady(value) { return value.targetRole.trim() && splitSkills(value.skills).length > 0; }
+    function phraseIn(text, phrase) { return normalizeText(text).includes(normalizeText(phrase)); }
+    function overlap(first, second) { return first.filter((item) => second.includes(item)); }
+    function roleRelevance(targetRole, job) {
+      const targetTerms = unique(tokenize(targetRole).filter((term) => term.length > 2));
+      if (!targetTerms.length) return { percent: 0, terms: [] };
+      const jobText = `${job.title} ${job.roleKeywords.join(' ')}`;
+      const terms = targetTerms.filter((term) => tokenize(jobText).includes(term));
+      return { percent: terms.length / targetTerms.length, terms };
+    }
+    function getMatch(job, userProfile) {
+      const skills = splitSkills(userProfile.skills);
+      const required = job.requiredSkills.map(normalizeText);
+      const preferred = job.preferredSkills.map(normalizeText);
+      const matchedRequired = overlap(required, skills);
+      const matchedPreferred = overlap(preferred, skills);
+      const role = roleRelevance(userProfile.targetRole, job);
+      let points = 0;
+      let possible = 80;
+      points += required.length ? (matchedRequired.length / required.length) * 45 : 0;
+      points += preferred.length ? (matchedPreferred.length / preferred.length) * 15 : 0;
+      points += role.percent * 20;
+      const preferences = [];
+      const cautions = [];
+      if (userProfile.industry) { possible += 10; if (userProfile.industry === job.industry) { points += 10; preferences.push(`${job.industry} industry`); } else cautions.push(`${job.industry} is different from your preferred industry`); }
+      if (userProfile.workMode || userProfile.location) {
+        possible += 5;
+        const workMatch = userProfile.workMode && userProfile.workMode === job.workMode;
+        const locationMatch = userProfile.location && (phraseIn(job.location, userProfile.location) || phraseIn(userProfile.location, job.workMode));
+        if (workMatch || locationMatch) { points += 5; preferences.push(workMatch ? `${job.workMode.toLowerCase()} work` : `${job.location} location`); }
+        else if (userProfile.workMode) cautions.push(`${job.workMode} work differs from your ${userProfile.workMode.toLowerCase()} preference`);
+      }
+      if (userProfile.experience) { possible += 5; if (userProfile.experience === job.experience) { points += 5; preferences.push(`${job.experience.toLowerCase()} level`); } }
+      const score = Math.round(Math.min(100, (points / possible) * 100));
+      const matchedSkills = unique([...matchedRequired, ...matchedPreferred]);
+      const missingSkills = required.filter((skill) => !skills.includes(skill)).slice(0, 3);
+      let reason = matchedSkills.length ? `You already have ${matchedSkills.slice(0, 3).join(', ')}.` : 'This is a role-adjacent opportunity with room to grow your skills.';
+      if (role.terms.length) reason += ` Your target role overlaps on ${role.terms.join(' and ')}.`;
+      else if (preferences.length) reason += ` It also aligns with your ${preferences.join(' and ')} preference${preferences.length === 1 ? '' : 's'}.`;
+      return { job, score, skillsPercent: required.length ? Math.round((matchedRequired.length / required.length) * 100) : 0, rolePercent: Math.round(role.percent * 100), matchedSkills, missingSkills, preferences, cautions, reason };
+    }
+    function tier(match) { return match.score >= 75 ? { name: 'Strong match', className: 'strong' } : match.score >= 48 ? { name: 'Potential match', className: 'potential' } : { name: 'Lower overlap', className: '' }; }
+    function getSortedMatches() {
+      const matches = curatedJobs.map((job) => getMatch(job, profile));
+      const sort = $('#match-sort').value;
+      if (sort === 'skills') return matches.sort((a, b) => b.skillsPercent - a.skillsPercent || b.score - a.score);
+      if (sort === 'role') return matches.sort((a, b) => b.rolePercent - a.rolePercent || b.score - a.score);
+      return matches.sort((a, b) => b.score - a.score || a.job.title.localeCompare(b.job.title));
+    }
+    function alreadyTracked(job) { return applications.some((application) => normalizeText(application.company) === normalizeText(job.company) && normalizeText(application.role) === normalizeText(job.title)); }
+    function renderMatches() {
+      if (!profileIsReady(profile)) return;
+      currentMatches = getSortedMatches();
+      const closeMatches = currentMatches.filter((match) => match.score >= 25);
+      const results = $('#match-results');
+      const status = $('#match-status');
+      if (!closeMatches.length) {
+        status.textContent = 'No close matches yet — try another role or add skills you want to use.';
+        results.className = 'matcher-empty';
+        results.innerHTML = `<div>${icons.briefcase}<h3>Try a broader profile</h3><p>We couldn’t find a close curated match. Update your role or add transferable skills, then try again.</p><button class="button button-secondary button-small" type="button" id="show-all-matches">Show all curated jobs</button></div>`;
+        return;
+      }
+      status.textContent = `${closeMatches.length} curated ${closeMatches.length === 1 ? 'match' : 'matches'} ranked for your profile.`;
+      results.className = 'match-list';
+      results.innerHTML = closeMatches.map((match) => {
+        const { job } = match;
+        const matchTier = tier(match);
+        const saved = alreadyTracked(job);
+        const matchedTags = match.matchedSkills.length ? match.matchedSkills.map((skill) => `<span class="skill-tag">${escapeHTML(skill)}</span>`).join('') : '<span class="skill-tag">Role-adjacent opportunity</span>';
+        const detailParts = [];
+        if (match.missingSkills.length) detailParts.push(`Skills to build: ${match.missingSkills.join(', ')}.`);
+        if (match.cautions.length) detailParts.push(match.cautions.join('. ') + '.');
+        if (!detailParts.length) detailParts.push('Your selected preferences align closely with this demo opportunity.');
+        return `<article class="match-card"><div class="match-card-top"><div><h3>${escapeHTML(job.title)}</h3><p class="match-company">${escapeHTML(job.company)} · ${escapeHTML(job.industry)}</p></div><div class="match-score ${matchTier.className}" aria-label="${match.score} percent profile match: ${matchTier.name}"><strong>${match.score}%</strong><span>${matchTier.name}</span></div></div><div class="match-meta"><span>${icons.pin}${escapeHTML(job.location)}</span><span>${icons.briefcase}${escapeHTML(job.workMode)} · ${escapeHTML(job.experience)}</span></div><p class="match-reason"><strong>Why it matched:</strong> ${escapeHTML(match.reason)}</p><div class="tag-list" aria-label="Matched skills">${matchedTags}</div><details><summary>See match details</summary><p>${escapeHTML(job.summary)}</p><p>${escapeHTML(detailParts.join(' '))}</p></details><div class="match-actions"><button class="button button-primary button-small" type="button" data-track-job="${job.id}" ${saved ? 'disabled aria-disabled="true"' : ''}>${saved ? 'Already in tracker' : 'Track application'}</button></div></article>`;
+      }).join('');
+    }
+
+    $('#profile-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const candidate = readProfileForm();
+      const roleError = candidate.targetRole ? '' : 'Add the type of role you want.';
+      const skillsError = splitSkills(candidate.skills).length ? '' : 'Add at least one skill, separated by commas.';
+      setProfileFieldError('target-role', roleError);
+      setProfileFieldError('profile-skills', skillsError);
+      const focusField = roleError ? '#target-role' : skillsError ? '#profile-skills' : '';
+      if (focusField) { $(focusField).focus(); return; }
+      profile = candidate;
+      saveProfile();
+      renderMatches();
+      $('#matches-heading').focus();
+      showToast('Your private search profile is saved.');
+    });
+    $('#reset-profile').addEventListener('click', () => {
+      if (!profileIsReady(profile) || window.confirm('Clear your saved job search profile? Your applications will stay untouched.')) {
+        profile = { ...defaultProfile };
+        try { localStorage.removeItem(PROFILE_STORAGE_KEY); } catch { /* Browser storage may be unavailable. */ }
+        fillProfileForm();
+        setProfileFieldError('target-role', '');
+        setProfileFieldError('profile-skills', '');
+        currentMatches = [];
+        $('#match-results').className = 'matcher-empty';
+        $('#match-results').innerHTML = `<div><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.2-4.2M11 8v6M8 11h6"/></svg><h3>Ready when you are</h3><p>Add a target role and a few skills to see which curated opportunities are worth exploring first.</p></div>`;
+        $('#match-status').textContent = 'Your job-search profile was cleared.';
+        showToast('Job-search profile cleared.');
+      }
+    });
+    ['target-role', 'profile-skills'].forEach((field) => $(field).addEventListener('input', () => setProfileFieldError(field, '')));
+    $('#match-sort').addEventListener('change', () => { if (profileIsReady(profile)) renderMatches(); });
+    $('#match-results').addEventListener('click', (event) => {
+      const showAll = event.target.closest('#show-all-matches');
+      if (showAll) {
+        currentMatches = curatedJobs.map((job) => getMatch(job, profile));
+        $('#match-status').textContent = `Showing all ${currentMatches.length} curated jobs. Update your profile to improve the ranking.`;
+        const original = $('#match-sort').value;
+        $('#match-sort').value = 'best';
+        const all = getSortedMatches();
+        $('#match-sort').value = original;
+        $('#match-results').className = 'match-list';
+        $('#match-results').innerHTML = all.map((match) => {
+          const { job } = match; const matchTier = tier(match); const saved = alreadyTracked(job);
+          return `<article class="match-card"><div class="match-card-top"><div><h3>${escapeHTML(job.title)}</h3><p class="match-company">${escapeHTML(job.company)} · ${escapeHTML(job.industry)}</p></div><div class="match-score ${matchTier.className}" aria-label="${match.score} percent profile match: ${matchTier.name}"><strong>${match.score}%</strong><span>${matchTier.name}</span></div></div><div class="match-meta"><span>${icons.pin}${escapeHTML(job.location)}</span><span>${icons.briefcase}${escapeHTML(job.workMode)} · ${escapeHTML(job.experience)}</span></div><p class="match-reason"><strong>Why it matched:</strong> ${escapeHTML(match.reason)}</p><div class="match-actions"><button class="button button-primary button-small" type="button" data-track-job="${job.id}" ${saved ? 'disabled aria-disabled="true"' : ''}>${saved ? 'Already in tracker' : 'Track application'}</button></div></article>`;
+        }).join('');
+        return;
+      }
+      const button = event.target.closest('[data-track-job]');
+      if (!button) return;
+      const job = curatedJobs.find((item) => item.id === button.dataset.trackJob);
+      if (!job) return;
+      if (alreadyTracked(job)) { showToast('That opportunity is already in your tracker.'); return; }
+      applications.unshift({ id: `match-${Date.now()}-${Math.random().toString(16).slice(2)}`, company: job.company, role: job.title, stage: 'Applied', date: formatISO(new Date()), source: 'curated-match', matchId: job.id });
+      saveApplications();
+      renderApplications();
+      showToast(`${job.company} was added to your tracker.`);
+      $('#tracker').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
 
     $('#application-form').addEventListener('submit', (event) => {
       event.preventDefault();
@@ -338,10 +601,7 @@
       const firstError = Object.keys(errors).find((field) => errors[field]);
       if (firstError) { $(`#${firstError}`).focus(); return; }
       applications.unshift({ id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, company, role, stage: $('#stage').value, date });
-      saveApplications();
-      renderApplications();
-      event.target.reset();
-      $('#date').value = formatISO(new Date());
+      saveApplications(); renderApplications(); event.target.reset(); $('#date').value = formatISO(new Date());
       showToast(needsFollowUp(applications[0]) ? 'Application saved — it is ready for a follow-up.' : 'Application saved to your tracker.');
       $('#tracker').scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
@@ -359,9 +619,7 @@
         const application = applications.find((item) => item.id === deleteButton.dataset.delete);
         if (!window.confirm(`Delete ${application.company} — ${application.role}?`)) return;
         applications = applications.filter((item) => item.id !== application.id);
-        saveApplications();
-        renderApplications();
-        showToast('Application deleted.');
+        saveApplications(); renderApplications(); showToast('Application deleted.');
       }
     });
 
@@ -378,19 +636,16 @@
       if (!ad || !cv) { showToast('Paste both the job ad and CV text to compare them.'); return; }
       const adKeywords = keywords(ad);
       const missing = adKeywords.filter((word) => !new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(cv)).slice(0, 12);
-      const results = $('#gap-results');
-      const list = $('#keyword-list');
-      results.classList.add('show');
-      list.innerHTML = '';
-      $('#match-message').classList.toggle('show', missing.length === 0);
-      if (missing.length) {
-        $('#gap-summary').textContent = `${missing.length} useful keyword${missing.length === 1 ? '' : 's'} from the job ad didn’t appear in your CV text.`;
-        missing.forEach((word) => { const tag = document.createElement('span'); tag.className = 'keyword'; tag.textContent = word; list.appendChild(tag); });
-      } else { $('#gap-summary').textContent = ''; }
+      const results = $('#gap-results'); const list = $('#keyword-list');
+      results.classList.add('show'); list.innerHTML = ''; $('#match-message').classList.toggle('show', missing.length === 0);
+      if (missing.length) { $('#gap-summary').textContent = `${missing.length} useful keyword${missing.length === 1 ? '' : 's'} from the job ad didn’t appear in your CV text.`; missing.forEach((word) => { const tag = document.createElement('span'); tag.className = 'keyword'; tag.textContent = word; list.appendChild(tag); }); }
+      else { $('#gap-summary').textContent = ''; }
     });
 
     $('#date').value = formatISO(new Date());
+    fillProfileForm();
     renderApplications();
+    if (profileIsReady(profile)) renderMatches();
   </script>
 </body>
 </html>
