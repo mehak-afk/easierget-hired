@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A private, browser-based job application tracker with follow-up reminders." />
+  <title>EasierGet hired — Job application tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0f2542;
+      --muted: #62718a;
+      --blue: #07679b;
+      --blue-dark: #064e78;
+      --sky: #e7f6fc;
+      --card: #ffffff;
+      --line: #c8e1ed;
+      --green: #057a55;
+      --green-bg: #d8f4e6;
+      --amber: #9a5b00;
+      --amber-bg: #fff0c9;
+      --red: #b52235;
+      --red-bg: #fff0f1;
+      --page: #f1faff;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      color: var(--ink);
+      background: var(--page);
+      font-family: "Plus Jakarta Sans", Arial, sans-serif;
+      line-height: 1.5;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid #0b75ad;
+      outline-offset: 3px;
+    }
+    .skip-link { position: absolute; top: -80px; left: 1rem; z-index: 20; background: #fff; padding: .7rem 1rem; border-radius: 8px; color: var(--blue-dark); }
+    .skip-link:focus { top: 1rem; }
+    .shell { max-width: 1220px; margin: 0 auto; padding: 0 24px 48px; }
+
+    header { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 24px 0; }
+    .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-size: 18px; font-weight: 800; letter-spacing: -.04em; }
+    .brand-mark { display: grid; width: 37px; height: 37px; place-items: center; border-radius: 11px; background: var(--blue); color: #fff; }
+    .brand-mark svg { width: 22px; height: 22px; }
+    .local-note { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 600; }
+    .local-note svg { color: var(--green); width: 18px; height: 18px; }
+
+    .hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 24px; padding: 33px 0 30px; }
+    .eyebrow { display: inline-flex; gap: 7px; align-items: center; margin: 0 0 11px; color: var(--blue-dark); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 760px; margin-bottom: 10px; font-size: clamp(30px, 4.7vw, 52px); letter-spacing: -.055em; line-height: 1.1; }
+    .hero p { max-width: 620px; margin-bottom: 0; color: var(--muted); font-size: 16px; }
+    .hero-action { flex: 0 0 auto; align-self: center; }
+    .button { display: inline-flex; min-height: 46px; align-items: center; justify-content: center; gap: 9px; border: 1px solid transparent; border-radius: 10px; padding: 0 16px; font-size: 14px; font-weight: 800; text-decoration: none; transition: background-color .18s ease, border-color .18s ease, transform .18s ease; }
+    .button:hover { transform: translateY(-1px); }
+    .button svg { width: 18px; height: 18px; }
+    .button-primary { color: #fff; background: var(--blue); }
+    .button-primary:hover { background: var(--blue-dark); }
+    .button-secondary { color: var(--blue-dark); background: #fff; border-color: var(--line); }
+    .button-secondary:hover { background: var(--sky); border-color: var(--blue); }
+    .button-small { min-height: 38px; padding: 0 12px; font-size: 12px; }
+
+    .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 26px; }
+    .metric { min-height: 120px; padding: 19px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
+    .metric-label { display: flex; align-items: center; gap: 7px; margin-bottom: 10px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .metric-label svg { width: 17px; height: 17px; color: var(--blue); }
+    .metric-value { font-size: 30px; font-weight: 800; letter-spacing: -.05em; line-height: 1; }
+    .metric-copy { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+    .metric.alert { border-color: #f4afb6; background: var(--red-bg); }
+    .metric.alert .metric-label, .metric.alert .metric-label svg, .metric.alert .metric-value { color: var(--red); }
+
+    .content-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .75fr); gap: 22px; align-items: start; }
+    .panel { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 21px 22px 18px; border-bottom: 1px solid var(--line); }
+    .panel-title { margin: 0; font-size: 18px; letter-spacing: -.035em; }
+    .panel-subtitle { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+    .count { flex: 0 0 auto; padding: 4px 9px; border-radius: 99px; color: var(--blue-dark); background: var(--sky); font-size: 12px; font-weight: 800; }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 690px; }
+    th { padding: 13px 22px; color: var(--muted); background: #fbfdff; border-bottom: 1px solid var(--line); font-size: 11px; font-weight: 800; letter-spacing: .06em; text-align: left; text-transform: uppercase; }
+    td { padding: 15px 22px; border-bottom: 1px solid #e5f1f6; font-size: 13px; vertical-align: middle; }
+    tbody tr { transition: background-color .18s ease; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: #f7fcff; }
+    tbody tr.overdue { background: var(--red-bg); }
+    tbody tr.overdue:hover { background: #ffe5e8; }
+    .company { display: block; font-weight: 800; }
+    .role { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .status { display: inline-flex; align-items: center; gap: 6px; padding: 5px 8px; border-radius: 99px; color: #30536a; background: #e8f2f6; font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .status.interview { color: #864f00; background: var(--amber-bg); }
+    .status.offer { color: #086747; background: var(--green-bg); }
+    .status.rejected { color: #6a7380; background: #edf0f3; }
+    .age { color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .age.overdue-age { color: var(--red); font-weight: 800; }
+    .row-actions { display: flex; justify-content: flex-end; gap: 7px; }
+    .icon-button { display: inline-grid; width: 36px; height: 36px; place-items: center; color: var(--blue-dark); border: 1px solid var(--line); border-radius: 9px; background: #fff; transition: background-color .18s ease, border-color .18s ease; }
+    .icon-button:hover { background: var(--sky); border-color: var(--blue); }
+    .icon-button.danger { color: var(--red); }
+    .icon-button.danger:hover { background: #fff3f4; border-color: #ed8f9b; }
+    .icon-button svg { width: 17px; height: 17px; }
+    .empty { padding: 58px 22px; color: var(--muted); text-align: center; }
+    .empty svg { width: 34px; height: 34px; margin-bottom: 9px; color: var(--blue); }
+    .empty p { margin: 0; font-size: 13px; }
+
+    .side-stack { display: grid; gap: 22px; }
+    .form-body, .checker-body { padding: 22px; }
+    .form-grid { display: grid; gap: 13px; }
+    .field { display: grid; gap: 6px; }
+    label { font-size: 12px; font-weight: 800; }
+    input, select, textarea { width: 100%; min-height: 44px; padding: 10px 11px; color: var(--ink); border: 1px solid #a8cddb; border-radius: 9px; background: #fff; font-size: 14px; }
+    textarea { min-height: 112px; resize: vertical; line-height: 1.5; }
+    input::placeholder, textarea::placeholder { color: #8394a8; }
+    input:focus, select:focus, textarea:focus { border-color: var(--blue); }
+    .field-error { min-height: 18px; color: var(--red); font-size: 11px; font-weight: 700; }
+    .form-submit { width: 100%; margin-top: 4px; }
+    .helper { margin: 15px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .helper strong { color: var(--red); }
+
+    .checker .panel-header { align-items: flex-start; }
+    .checker-intro { margin: 0 0 13px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .checker .button { width: 100%; }
+    .gap-results { display: none; margin-top: 17px; padding-top: 17px; border-top: 1px solid var(--line); }
+    .gap-results.show { display: block; }
+    .gap-results h3 { margin-bottom: 8px; font-size: 13px; }
+    .gap-summary { margin-bottom: 10px; color: var(--muted); font-size: 12px; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 7px; }
+    .keyword { padding: 5px 8px; border-radius: 7px; color: var(--red); background: var(--red-bg); border: 1px solid #f5c7cc; font-size: 11px; font-weight: 800; }
+    .match-message { display: none; padding: 11px; border-radius: 9px; color: var(--green); background: var(--green-bg); font-size: 12px; font-weight: 700; }
+    .match-message.show { display: block; }
+
+    .toast { position: fixed; right: 22px; bottom: 22px; z-index: 10; display: flex; max-width: min(390px, calc(100vw - 44px)); align-items: center; gap: 10px; padding: 13px 14px; color: #fff; border-radius: 11px; background: var(--ink); box-shadow: 0 8px 24px rgba(15, 37, 66, .18); font-size: 13px; font-weight: 700; opacity: 0; pointer-events: none; transform: translateY(14px); transition: opacity .2s ease, transform .2s ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast svg { flex: 0 0 auto; width: 18px; height: 18px; color: #79dfb4; }
+
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; align-items: start; }
+      .hero-action { align-self: start; }
+      .content-grid { grid-template-columns: 1fr; }
+      .side-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+    }
+    @media (max-width: 610px) {
+      .shell { padding: 0 16px 34px; }
+      header { padding: 16px 0; }
+      .local-note span { display: none; }
+      .hero { padding: 25px 0 24px; }
+      .summary { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .metric { min-height: 110px; padding: 15px; }
+      .metric-value { font-size: 27px; }
+      .panel-header, .form-body, .checker-body { padding-left: 16px; padding-right: 16px; }
+      th, td { padding-left: 16px; padding-right: 16px; }
+      .side-stack { grid-template-columns: 1fr; }
+      .button { min-height: 48px; }
+      .hero-action .button { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#tracker">Skip to applications</a>
+  <div class="shell">
+    <header>
+      <a class="brand" href="#top" aria-label="EasierGet hired home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6V4h8v2"/><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 12h18M10 12v2h4v-2"/></svg>
+        </span>
+        <span>EasierGet <span style="color: var(--blue)">hired</span></span>
+      </a>
+      <div class="local-note" title="Your applications stay in this browser">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span>Saved privately in this browser</span>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">Job search, made easier</p>
+          <h1 id="page-title">Keep your next opportunity from going cold.</h1>
+          <p>Track every application in one clear view. We flag applications that deserve a friendly follow-up, so you always know your next move.</p>
+        </div>
+        <div class="hero-action"><a class="button button-primary" href="#add-application"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add application</a></div>
+      </section>
+
+      <section class="summary" aria-label="Application summary">
+        <article class="metric"><div class="metric-label"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>Total applications</div><div class="metric-value" id="total-count">0</div><p class="metric-copy">Every opportunity in view</p></article>
+        <article class="metric"><div class="metric-label"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7 9 18l-5-5"/></svg>In progress</div><div class="metric-value" id="progress-count">0</div><p class="metric-copy">Applied or interviewing</p></article>
+        <article class="metric alert"><div class="metric-label"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.3 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.3a2 2 0 0 0-3.4 0Z"/></svg>Follow-ups due</div><div class="metric-value" id="followup-count">0</div><p class="metric-copy">14+ days without a move</p></article>
+        <article class="metric"><div class="metric-label"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>Offers</div><div class="metric-value" id="offer-count">0</div><p class="metric-copy">Proof your work is paying off</p></article>
+      </section>
+
+      <section class="content-grid">
+        <section class="panel" id="tracker" aria-labelledby="applications-heading">
+          <div class="panel-header"><div><h2 class="panel-title" id="applications-heading">Your applications</h2><p class="panel-subtitle">Red rows need a follow-up today.</p></div><span class="count" id="table-count">0 applications</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th scope="col">Company & role</th><th scope="col">Stage</th><th scope="col">Applied</th><th scope="col">Follow-up</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
+              <tbody id="applications-body"></tbody>
+            </table>
+          </div>
+          <div class="empty" id="empty-state" hidden>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M7 11h10M7 15h6"/></svg>
+            <p>No applications yet. Add your first one and we’ll keep the follow-ups on track.</p>
+          </div>
+        </section>
+
+        <aside class="side-stack">
+          <section class="panel" id="add-application" aria-labelledby="add-heading">
+            <div class="panel-header"><div><h2 class="panel-title" id="add-heading">Add an application</h2><p class="panel-subtitle">The essentials, nothing extra.</p></div></div>
+            <form class="form-body" id="application-form" novalidate>
+              <div class="form-grid">
+                <div class="field"><label for="company">Company <span aria-hidden="true">*</span></label><input id="company" name="company" autocomplete="organization" placeholder="e.g. Brightline Studio" required /><div class="field-error" id="company-error" aria-live="polite"></div></div>
+                <div class="field"><label for="role">Role <span aria-hidden="true">*</span></label><input id="role" name="role" autocomplete="organization-title" placeholder="e.g. Junior Designer" required /><div class="field-error" id="role-error" aria-live="polite"></div></div>
+                <div class="field"><label for="stage">Stage <span aria-hidden="true">*</span></label><select id="stage" name="stage"><option value="Applied">Applied</option><option value="Interview">Interview</option><option value="Offer">Offer</option><option value="Rejected">Rejected</option></select></div>
+                <div class="field"><label for="date">Applied date <span aria-hidden="true">*</span></label><input id="date" name="date" type="date" required /><div class="field-error" id="date-error" aria-live="polite"></div></div>
+                <button class="button button-primary form-submit" type="submit"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Save application</button>
+              </div>
+              <p class="helper"><strong>Follow-up rule:</strong> Applied and Interview applications turn red after 14 days.</p>
+            </form>
+          </section>
+
+          <section class="panel checker" aria-labelledby="checker-heading">
+            <div class="panel-header"><div><h2 class="panel-title" id="checker-heading">CV keyword check</h2><p class="panel-subtitle">A quick way to tailor your application.</p></div></div>
+            <div class="checker-body">
+              <p class="checker-intro">Paste a job ad and your CV text. We’ll surface useful job-ad keywords that are missing from your CV.</p>
+              <div class="field"><label for="job-ad">Job ad</label><textarea id="job-ad" placeholder="Paste the job description here…"></textarea></div>
+              <div class="field" style="margin-top: 13px"><label for="cv-text">Your CV text</label><textarea id="cv-text" placeholder="Paste your CV or résumé here…"></textarea></div>
+              <button class="button button-secondary" type="button" id="check-keywords" style="margin-top: 13px"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.2-4.2"/></svg>Check keyword gaps</button>
+              <div class="gap-results" id="gap-results" aria-live="polite"><h3>Keywords to consider</h3><p class="gap-summary" id="gap-summary"></p><div class="tag-list" id="keyword-list"></div><p class="match-message" id="match-message">Great match — we couldn’t find any prominent ad keywords missing from your CV text.</p></div>
+            </div>
+          </section>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="m5 12 4 4L19 6"/></svg><span id="toast-message"></span></div>
+
+  <script>
+    const STORAGE_KEY = 'easierget-hired-applications-v1';
+    const $ = (selector) => document.querySelector(selector);
+    const icons = {
+      copy: '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 9V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"/></svg>',
+      trash: '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M9 7l1-3h4l1 3M6 7l1 13h10l1-13"/></svg>'
+    };
+
+    const formatISO = (date) => {
+      const offset = date.getTimezoneOffset() * 60000;
+      return new Date(date.getTime() - offset).toISOString().slice(0, 10);
+    };
+    const dateDaysAgo = (days) => { const date = new Date(); date.setDate(date.getDate() - days); return formatISO(date); };
+    const defaultApplications = [
+      { id: 'demo-1', company: 'Northstar Labs', role: 'Product Marketing Coordinator', stage: 'Applied', date: dateDaysAgo(18) },
+      { id: 'demo-2', company: 'Cedar & Co.', role: 'People Operations Assistant', stage: 'Interview', date: dateDaysAgo(14) },
+      { id: 'demo-3', company: 'Harbor Health', role: 'Client Success Associate', stage: 'Applied', date: dateDaysAgo(13) },
+      { id: 'demo-4', company: 'Fable Finance', role: 'Community Manager', stage: 'Offer', date: dateDaysAgo(5) }
+    ];
+
+    let applications = getApplications();
+    function getApplications() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultApplications; }
+      catch { return defaultApplications; }
+    }
+    function saveApplications() { localStorage.setItem(STORAGE_KEY, JSON.stringify(applications)); }
+    function dayDiff(dateString) {
+      const [year, month, day] = dateString.split('-').map(Number);
+      const appliedDate = new Date(year, month - 1, day);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return Math.max(0, Math.floor((today - appliedDate) / 86400000));
+    }
+    function needsFollowUp(application) { return ['Applied', 'Interview'].includes(application.stage) && dayDiff(application.date) >= 14; }
+    function prettyDate(dateString) { return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(`${dateString}T12:00:00`)); }
+    function escapeHTML(value) { const div = document.createElement('div'); div.textContent = value; return div.innerHTML; }
+    function showToast(message) {
+      $('#toast-message').textContent = message;
+      $('#toast').classList.add('show');
+      window.clearTimeout(showToast.timeout);
+      showToast.timeout = window.setTimeout(() => $('#toast').classList.remove('show'), 3800);
+    }
+
+    function renderApplications() {
+      const body = $('#applications-body');
+      const sorted = [...applications].sort((a, b) => Number(needsFollowUp(b)) - Number(needsFollowUp(a)) || a.date.localeCompare(b.date));
+      body.innerHTML = '';
+      $('#empty-state').hidden = applications.length > 0;
+      $('.table-wrap').hidden = applications.length === 0;
+      sorted.forEach((application) => {
+        const overdue = needsFollowUp(application);
+        const age = dayDiff(application.date);
+        const tr = document.createElement('tr');
+        if (overdue) tr.className = 'overdue';
+        const statusClass = application.stage.toLowerCase();
+        tr.innerHTML = `
+          <td><span class="company">${escapeHTML(application.company)}</span><span class="role">${escapeHTML(application.role)}</span></td>
+          <td><span class="status ${statusClass}">${escapeHTML(application.stage)}</span></td>
+          <td>${prettyDate(application.date)}</td>
+          <td><span class="age ${overdue ? 'overdue-age' : ''}">${overdue ? `${age} days — due now` : `${age} day${age === 1 ? '' : 's'} ago`}</span></td>
+          <td><div class="row-actions">
+            <button class="icon-button" type="button" data-copy="${application.id}" aria-label="Copy follow-up message for ${escapeHTML(application.company)}">${icons.copy}</button>
+            <button class="icon-button danger" type="button" data-delete="${application.id}" aria-label="Delete application for ${escapeHTML(application.company)}">${icons.trash}</button>
+          </div></td>`;
+        body.appendChild(tr);
+      });
+      const total = applications.length;
+      const inProgress = applications.filter((a) => ['Applied', 'Interview'].includes(a.stage)).length;
+      const due = applications.filter(needsFollowUp).length;
+      const offers = applications.filter((a) => a.stage === 'Offer').length;
+      $('#total-count').textContent = total;
+      $('#progress-count').textContent = inProgress;
+      $('#followup-count').textContent = due;
+      $('#offer-count').textContent = offers;
+      $('#table-count').textContent = `${total} application${total === 1 ? '' : 's'}`;
+    }
+
+    $('#application-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const company = $('#company').value.trim();
+      const role = $('#role').value.trim();
+      const date = $('#date').value;
+      const errors = { company: company ? '' : 'Add the company name.', role: role ? '' : 'Add the role title.', date: date ? '' : 'Choose the applied date.' };
+      Object.entries(errors).forEach(([field, message]) => $(`#${field}-error`).textContent = message);
+      const firstError = Object.keys(errors).find((field) => errors[field]);
+      if (firstError) { $(`#${firstError}`).focus(); return; }
+      applications.unshift({ id: `${Date.now()}-${Math.random().toString(16).slice(2)}`, company, role, stage: $('#stage').value, date });
+      saveApplications();
+      renderApplications();
+      event.target.reset();
+      $('#date').value = formatISO(new Date());
+      showToast(needsFollowUp(applications[0]) ? 'Application saved — it is ready for a follow-up.' : 'Application saved to your tracker.');
+      $('#tracker').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    $('#applications-body').addEventListener('click', async (event) => {
+      const copyButton = event.target.closest('[data-copy]');
+      const deleteButton = event.target.closest('[data-delete]');
+      if (copyButton) {
+        const application = applications.find((item) => item.id === copyButton.dataset.copy);
+        const message = `Hi [Name],\n\nI hope you’re well. I wanted to follow up on my application for the ${application.role} role at ${application.company}. I’m still very interested in the opportunity and would love to hear if there’s an update on the hiring process.\n\nThank you for your time,\n[Your name]`;
+        try { await navigator.clipboard.writeText(message); showToast('Follow-up message copied — personalize and send it.'); }
+        catch { showToast('Copy unavailable here. Please try again in a secure browser tab.'); }
+      }
+      if (deleteButton) {
+        const application = applications.find((item) => item.id === deleteButton.dataset.delete);
+        if (!window.confirm(`Delete ${application.company} — ${application.role}?`)) return;
+        applications = applications.filter((item) => item.id !== application.id);
+        saveApplications();
+        renderApplications();
+        showToast('Application deleted.');
+      }
+    });
+
+    const STOP_WORDS = new Set('a an the and or but if then than to for of in on at by from with as is are was were be been being this that these those it its you your we our they their will would should can could may might must about across after all also any because before between both each every first have has had how into more most not other out over same so some such through under up very what when where which who why work working role team company candidate required preferred experience skills skill years year job position plus including able strong excellent opportunity responsibilities responsible develop support manage ensure help using use used'.split(' '));
+    function keywords(text) {
+      const words = text.toLowerCase().match(/[a-z][a-z+#.-]{2,}/g) || [];
+      const frequencies = new Map();
+      words.forEach((word) => { if (!STOP_WORDS.has(word) && !/^\d/.test(word)) frequencies.set(word, (frequencies.get(word) || 0) + 1); });
+      return [...frequencies.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([word]) => word);
+    }
+    $('#check-keywords').addEventListener('click', () => {
+      const ad = $('#job-ad').value.trim();
+      const cv = $('#cv-text').value.trim().toLowerCase();
+      if (!ad || !cv) { showToast('Paste both the job ad and CV text to compare them.'); return; }
+      const adKeywords = keywords(ad);
+      const missing = adKeywords.filter((word) => !new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(cv)).slice(0, 12);
+      const results = $('#gap-results');
+      const list = $('#keyword-list');
+      results.classList.add('show');
+      list.innerHTML = '';
+      $('#match-message').classList.toggle('show', missing.length === 0);
+      if (missing.length) {
+        $('#gap-summary').textContent = `${missing.length} useful keyword${missing.length === 1 ? '' : 's'} from the job ad didn’t appear in your CV text.`;
+        missing.forEach((word) => { const tag = document.createElement('span'); tag.className = 'keyword'; tag.textContent = word; list.appendChild(tag); });
+      } else { $('#gap-summary').textContent = ''; }
+    });
+
+    $('#date').value = formatISO(new Date());
+    renderApplications();
+  </script>
+</body>
+</html>
